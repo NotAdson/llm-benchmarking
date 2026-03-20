@@ -44,9 +44,11 @@ class GSM8KBenchmark(BaseBenchmark):
         prompt += "Let's solve this step by step:\n"
         return prompt
         
-    def extract_answer(self, response: str) -> float:
+    def extract_answer(self, response: Union[str, List[str]]) -> float:
         """Extract the final numerical answer from the model's response."""
         try:
+            if isinstance(response, list):
+                response = response[0] if response else ""
             # Look for the last number in the response
             numbers = [float(s) for s in response.split() if s.replace('.', '').replace('-', '').isdigit()]
             if numbers:
