@@ -9,22 +9,6 @@
   },
   "models": {
     "gemma": {
-      "gemma-3-1b-it-4bit": {
-        "type": "gemma",
-        "name": "unsloth/gemma-3-1b-it-bnb-4bit",
-        "torch_dtype": "float16",
-        "low_memory": false,
-        "requires_auth": false,
-        "load_in_4bit": true
-      },
-      "gemma-3-4b-it-4bit": {
-        "type": "gemma",
-        "name": "unsloth/gemma-3-4b-it-bnb-4bit",
-        "torch_dtype": "float16",
-        "low_memory": true,
-        "requires_auth": false,
-        "load_in_4bit": true
-      },
       "gemma-3-1b-lora": {
         "type": "gemma",
         "name": "unsloth/gemma-3-1b-it-bnb-4bit",
@@ -38,6 +22,22 @@
         "type": "gemma",
         "name": "unsloth/gemma-3-4b-it-bnb-4bit",
         "peft_model": "adson-silva/gemma3-4b-gsm8k",
+        "torch_dtype": "float16",
+        "low_memory": true,
+        "requires_auth": false,
+        "load_in_4bit": true
+      },
+      "gemma-3-1b-it-4bit": {
+        "type": "gemma",
+        "name": "unsloth/gemma-3-1b-it-bnb-4bit",
+        "torch_dtype": "float16",
+        "low_memory": false,
+        "requires_auth": false,
+        "load_in_4bit": true
+      },
+      "gemma-3-4b-it-4bit": {
+        "type": "gemma",
+        "name": "unsloth/gemma-3-4b-it-bnb-4bit",
         "torch_dtype": "float16",
         "low_memory": true,
         "requires_auth": false,
