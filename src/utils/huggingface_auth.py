@@ -1,6 +1,6 @@
 import os
 import logging
-from huggingface_hub import login, HfFolder
+from huggingface_hub import login, get_token
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def setup_huggingface_auth(token: Optional[str] = None, token_path: Optional[str
         
         # If still not found, check if already logged in
         if hf_token is None:
-            if HfFolder.get_token() is not None:
+            if get_token() is not None:
                 logger.info("Already logged in to Hugging Face")
                 return True
             else:
@@ -61,4 +61,4 @@ def is_authenticated() -> bool:
     Returns:
         bool: True if authenticated, False otherwise.
     """
-    return HfFolder.get_token() is not None
+    return get_token() is not None

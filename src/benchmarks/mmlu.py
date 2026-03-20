@@ -7,7 +7,7 @@ from datasets import load_dataset
 from tqdm import tqdm
 import numpy as np
 from pathlib import Path
-from huggingface_hub import HfFolder
+from huggingface_hub import get_token
 
 class MMLUBenchmark:
     def __init__(
@@ -25,7 +25,7 @@ class MMLUBenchmark:
         self.requires_auth = requires_auth
         
         # Check if user is logged in to HuggingFace
-        if requires_auth and not HfFolder.get_token():
+        if requires_auth and not get_token():
             raise RuntimeError(
                 "Authentication required but no HuggingFace token found. "
                 "Please run 'huggingface-cli login' first."
