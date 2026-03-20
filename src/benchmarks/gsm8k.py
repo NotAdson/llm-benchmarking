@@ -20,6 +20,7 @@ class GSM8KBenchmark(BaseBenchmark):
         self.dataset = None
         self.num_shots = config.get("num_shots", 3)
         self.split = config.get("split", "test")
+        self.dataset_fraction = config.get("dataset_fraction", 1.0)
         self.generation_kwargs = {
             "max_new_tokens": config.get("max_new_tokens", 256),
             "temperature": config.get("temperature", 0.7),
@@ -56,7 +57,9 @@ class GSM8KBenchmark(BaseBenchmark):
             if isinstance(response, list):
                 response = response[0] if response else ""
             # Look for the last number in the response
-            numbers = [float(s) for s in response.split() if s.replace('.', '').replace('-', '').isdigit()]
+            words = response.split()
+            clean_words = [w.rstrip('.,?!;:")') for w in words]
+            numbers = [float(s) for s in clean_words if s.replace('.', '').replace('-', '').isdigit()]
             if numbers:
                 return numbers[-1]
             return None
@@ -104,6 +107,12 @@ class GSM8KBenchmark(BaseBenchmark):
         # Get few-shot examples
         few_shot_examples = self.dataset.select(range(self.num_shots))
         eval_dataset = self.dataset.select(range(self.num_shots, len(self.dataset)))
+        
+        if self.dataset_fraction < 1.0:
+            eval_size = int(len(eval_dataset) * self.dataset_fraction)
+            eval_dataset = eval_dataset.select(range(eval_size))
+            logger.info(f"Using {self.dataset_fraction*100}% of the evaluation dataset ({eval_size} examples)")
+            
         batch_size = self.config.get("batch_size", 4)
         
         # Create batches
