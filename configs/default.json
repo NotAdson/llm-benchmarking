@@ -9,21 +9,6 @@
   },
   "models": {
     "gemma": {
-      "gemma-3-1b-lora": {
-        "type": "gemma",
-        "name": "google/gemma-3-1b-it",
-        "peft_model": "adson-silva/gemma3-1b-gsm8k",
-        "torch_dtype": "float16",
-        "low_memory": false,
-        "requires_auth": false
-      },
-      "gemma-3-1b-it": {
-        "type": "gemma",
-        "name": "google/gemma-3-1b-it",
-        "torch_dtype": "float16",
-        "low_memory": false,
-        "requires_auth": false
-      },
       "gemma-3-4b-lora": {
         "type": "gemma",
         "name": "google/gemma-3-4b-it",
@@ -43,7 +28,7 @@
   },
   "inference": {
     "batch_size": 16,
-    "max_new_tokens": 512,
+    "max_new_tokens": 256,
     "temperature": 0.01,
     "top_p": 0.9,
     "top_k": 50
