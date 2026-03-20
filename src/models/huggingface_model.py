@@ -55,6 +55,9 @@ class HuggingFaceModel(BaseModel):
             use_fast=True
         )
         
+        # Left padding is REQUIRED for batched generation in causal LLMs!
+        self.tokenizer.padding_side = "left"
+        
         # Set tokenizer padding token if needed
         if self.tokenizer.pad_token is None:
             self.tokenizer.pad_token = self.tokenizer.eos_token
