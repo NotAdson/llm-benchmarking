@@ -96,6 +96,10 @@ class GSM8KBenchmark(BaseBenchmark):
                 
                 is_correct = abs(predicted_answer - correct_answer) < 1e-6 if predicted_answer is not None else False
                 
+                if not is_correct:
+                    logger.info(f"\n[INCORRECT] Expected: {correct_answer} | Predicted: {predicted_answer}")
+                    logger.info(f"Model Response:\n{response}\n{'-'*40}")
+                
                 batch_results.append({
                     "question": example["question"],
                     "correct_answer": correct_answer,
