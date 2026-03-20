@@ -19,7 +19,10 @@ class BenchmarkRunner:
     def _initialize_model(self, model_config: Dict) -> Optional[object]:
         """Initialize a model from configuration."""
         try:
-            return self.model_factory.create_model(model_config)
+            model = self.model_factory.create_model(model_config)
+            if model and model.load():
+                return model
+            return None
         except Exception as e:
             self.logger.error(f"Failed to initialize model {model_config.get('name', 'unknown')}: {e}")
             return None
