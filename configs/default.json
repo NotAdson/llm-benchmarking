@@ -46,7 +46,7 @@
     }
   },
   "inference": {
-    "batch_size": 4,
+    "batch_size": 8,
     "max_new_tokens": 1024,
     "temperature": 0.01,
     "top_p": 0.9,
