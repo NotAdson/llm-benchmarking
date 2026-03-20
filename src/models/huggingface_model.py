@@ -133,6 +133,19 @@ class HuggingFaceModel(BaseModel):
     
     def prepare_inputs(self, prompts: List[str]) -> Dict[str, torch.Tensor]:
         """Prepare inputs for model inference."""
+        # Instruction-tuned models must use their chat template to function accurately
+        if hasattr(self.tokenizer, "chat_template") and self.tokenizer.chat_template is not None:
+            chat_prompts = []
+            for p in prompts:
+                messages = [{"role": "user", "content": p}]
+                chat_prompt = self.tokenizer.apply_chat_template(
+                    messages, 
+                    tokenize=False, 
+                    add_generation_prompt=True
+                )
+                chat_prompts.append(chat_prompt)
+            return self.tokenize(chat_prompts)
+            
         return self.tokenize(prompts)
     
     def generate(
