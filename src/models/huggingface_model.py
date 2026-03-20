@@ -171,6 +171,10 @@ class HuggingFaceModel(BaseModel):
             "eos_token_id": self.tokenizer.eos_token_id,
         }
         
+        # Suppress max_length warning by forcefully popping it if present in model config
+        if hasattr(self.model.generation_config, "max_length"):
+            self.model.generation_config.max_length = None
+        
         if temperature > 0:
             gen_kwargs["do_sample"] = True
             gen_kwargs["temperature"] = temperature

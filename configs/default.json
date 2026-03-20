@@ -46,8 +46,8 @@
     }
   },
   "inference": {
-    "batch_size": 16,
-    "max_new_tokens": 1024,
+    "batch_size": 32,
+    "max_new_tokens": 512,
     "temperature": 0.01,
     "top_p": 0.9,
     "top_k": 50
@@ -56,7 +56,7 @@
     "gsm8k": {
       "num_shots": 3,
       "split": "test",
-      "dataset_fraction": 0.2
+      "dataset_fraction": 0.1
     }
   },
   "report_format": [

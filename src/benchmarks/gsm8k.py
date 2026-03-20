@@ -40,15 +40,14 @@ class GSM8KBenchmark(BaseBenchmark):
             
     def format_prompt(self, question: str, few_shot_examples: Optional[List[Dict]] = None) -> str:
         """Format the prompt with few-shot examples if provided."""
-        prompt = "Let's solve this math problem step by step.\n\n"
+        prompt = "Solve the following math problem. You must format your final answer as '#### [number]' at the very end.\n\n"
         
         if few_shot_examples:
             for example in few_shot_examples:
                 prompt += f"Question: {example['question']}\n"
-                prompt += f"Let's solve this step by step:\n{example['answer']}\n\n"
+                prompt += f"Answer: {example['answer']}\n\n"
                 
-        prompt += f"Question: {question}\n"
-        prompt += "Let's solve this step by step:\n"
+        prompt += f"Question: {question}\nAnswer:"
         return prompt
         
     def extract_answer(self, response: Union[str, List[str]]) -> float:
@@ -56,12 +55,24 @@ class GSM8KBenchmark(BaseBenchmark):
         try:
             if isinstance(response, list):
                 response = response[0] if response else ""
-            # Look for the last number in the response
-            words = response.split()
-            clean_words = [w.rstrip('.,?!;:")') for w in words]
-            numbers = [float(s) for s in clean_words if s.replace('.', '').replace('-', '').isdigit()]
-            if numbers:
-                return numbers[-1]
+            
+            import re
+            
+            # First attempt: extract strictly using the instructed "####" format
+            if "####" in response:
+                target = response.split("####")[-1].strip()
+                clean_target = target.replace(',', '')
+                matches = re.findall(r"[-+]?\d*\.?\d+", clean_target)
+                if matches:
+                    return float(matches[0])  # Take the first number found after ####
+                    
+            # Fallback: Clean commas (e.g., 2,125 -> 2125) and grab the last number
+            clean_resp = str(response).replace(',', '')
+            # Find all numbers including negatives and decimals
+            matches = re.findall(r"[-+]?\d*\.?\d+", clean_resp)
+            
+            if matches:
+                return float(matches[-1])  # Take the last number in the response
             return None
         except Exception as e:
             logger.warning(f"Error extracting answer from response: {e}")
@@ -78,7 +89,10 @@ class GSM8KBenchmark(BaseBenchmark):
             for i, example in enumerate(examples):
                 response = responses[i]
                 predicted_answer = self.extract_answer(response)
-                correct_answer = float(example["answer"].split()[-1])
+                
+                # Parse correct answer securely
+                correct_str = example["answer"].split()[-1].replace(',', '')
+                correct_answer = float(correct_str)
                 
                 is_correct = abs(predicted_answer - correct_answer) < 1e-6 if predicted_answer is not None else False
                 
