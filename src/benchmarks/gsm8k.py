@@ -25,7 +25,7 @@ class GSM8KBenchmark(BaseBenchmark):
         """Load the GSM8K dataset."""
         try:
             logger.info("Loading GSM8K dataset...")
-            self.dataset = load_dataset("gsm8k", split=self.split)
+            self.dataset = load_dataset("gsm8k", "main", split=self.split)
             logger.info(f"Loaded {len(self.dataset)} examples from GSM8K {self.split} split")
         except Exception as e:
             logger.error(f"Error loading GSM8K dataset: {e}")
