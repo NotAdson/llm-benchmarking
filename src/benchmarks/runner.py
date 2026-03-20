@@ -41,7 +41,8 @@ class BenchmarkRunner:
     def run_gsm8k_benchmark(self, model: object, model_config: Dict) -> Optional[Dict]:
         """Run GSM8K benchmark for a specific model."""
         try:
-            gsm8k_config = self.config["benchmarks"]["gsm8k"]
+            gsm8k_config = self.config["benchmarks"]["gsm8k"].copy()
+            gsm8k_config.update(self.config.get("inference", {}))
             benchmark = GSM8KBenchmark(gsm8k_config)
             results = benchmark.run(model)
             return results
