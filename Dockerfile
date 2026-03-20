@@ -30,7 +30,7 @@ RUN useradd -m -u 1000 appuser && \
 USER appuser
 
 # Default command
-CMD ["python", "scripts/setup_wizard.py"]
+CMD ["python", "src/main.py"]
 
 # GPU version
 FROM base as gpu

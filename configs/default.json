@@ -9,28 +9,39 @@
   },
   "models": {
     "gemma": {
-      "gemma-2b": {
+      "gemma-3-1b-it-4bit": {
         "type": "gemma",
-        "name": "google/gemma-2b",
+        "name": "unsloth/gemma-3-1b-it-bnb-4bit",
         "torch_dtype": "float16",
         "low_memory": false,
-        "requires_auth": true
+        "requires_auth": false,
+        "load_in_4bit": true
       },
-      "gemma-7b": {
+      "gemma-3-4b-it-4bit": {
         "type": "gemma",
-        "name": "google/gemma-7b",
+        "name": "unsloth/gemma-3-4b-it-bnb-4bit",
         "torch_dtype": "float16",
         "low_memory": true,
-        "requires_auth": true
-      }
-    },
-    "mistral": {
-      "mistral-7b": {
-        "type": "mistral",
-        "name": "mistralai/Mistral-7B-v0.1",
+        "requires_auth": false,
+        "load_in_4bit": true
+      },
+      "gemma-3-1b-lora": {
+        "type": "gemma",
+        "name": "unsloth/gemma-3-1b-it-bnb-4bit",
+        "peft_model": "adson-silva/gemma3-1b-gsm8k",
+        "torch_dtype": "float16",
+        "low_memory": false,
+        "requires_auth": false,
+        "load_in_4bit": true
+      },
+      "gemma-3-4b-lora": {
+        "type": "gemma",
+        "name": "unsloth/gemma-3-4b-it-bnb-4bit",
+        "peft_model": "adson-silva/gemma3-4b-gsm8k",
         "torch_dtype": "float16",
         "low_memory": true,
-        "requires_auth": false
+        "requires_auth": false,
+        "load_in_4bit": true
       }
     }
   },
@@ -42,17 +53,9 @@
     "top_k": 50
   },
   "benchmarks": {
-    "mmlu": {
-      "subjects": ["all"],
-      "num_shots": 5
-    },
     "gsm8k": {
       "num_shots": 3,
       "split": "test"
-    },
-    "humaneval": {
-      "temperature": 0.1,
-      "num_samples": 1
     }
   },
   "report_format": ["json", "md"]

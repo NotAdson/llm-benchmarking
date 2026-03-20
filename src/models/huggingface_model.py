@@ -60,25 +60,48 @@ class HuggingFaceModel(BaseModel):
             self.tokenizer.pad_token = self.tokenizer.eos_token
         
         # Load model with appropriate settings
+        # Replace device_map logic slightly to better handle quantization
         model_kwargs = {
             "cache_dir": self.cache_dir,
             "torch_dtype": self.torch_dtype,
-            "device_map": self.device if self.low_memory else None,
+            "device_map": "auto" if self.low_memory else None,
         }
+        
+        # Handle 4-bit quantization
+        if self.kwargs.get("load_in_4bit", False):
+            try:
+                from transformers import BitsAndBytesConfig
+                model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                    load_in_4bit=True,
+                    bnb_4bit_compute_dtype=self.torch_dtype,
+                )
+                model_kwargs["device_map"] = "auto"
+            except ImportError:
+                logger.warning("bitsandbytes not installed. Ignoring load_in_4bit.")
+            self.kwargs.pop("load_in_4bit", None)
+            
+        # Extract peft_model
+        peft_model_name = self.kwargs.pop("peft_model", None)
         
         # Update with additional kwargs
         model_kwargs.update(self.kwargs)
         
         try:
+            logger.info(f"Loading base model {self.model_name}")
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 **model_kwargs
             )
             
-            if not self.low_memory:
+            if peft_model_name:
+                logger.info(f"Loading PEFT adapter: {peft_model_name}")
+                from peft import PeftModel
+                self.model = PeftModel.from_pretrained(self.model, peft_model_name)
+            
+            if not self.low_memory and "quantization_config" not in model_kwargs:
                 self.model.to(self.device)
                 
-            logger.info(f"Successfully loaded {self.model_name}")
+            logger.info(f"Successfully loaded {self.model_name}" + (f" with adapter {peft_model_name}" if peft_model_name else ""))
             return True
         except Exception as e:
             logger.error(f"Failed to load model {self.model_name}: {str(e)}")
