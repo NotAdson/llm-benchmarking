@@ -19,15 +19,9 @@ class BenchmarkRunner:
     def _initialize_model(self, model_config: Dict) -> Optional[object]:
         """Initialize a model from configuration."""
         try:
-            return self.model_factory.create_model(
-                model_type=model_config["type"],
-                model_name=model_config["name"],
-                torch_dtype=model_config["torch_dtype"],
-                low_memory=model_config.get("low_memory", False),
-                requires_auth=model_config.get("requires_auth", True)
-            )
+            return self.model_factory.create_model(model_config)
         except Exception as e:
-            self.logger.error(f"Failed to initialize model {model_config['name']}: {e}")
+            self.logger.error(f"Failed to initialize model {model_config.get('name', 'unknown')}: {e}")
             return None
             
     def run_mmlu_benchmark(self, model: object, model_config: Dict) -> Optional[Dict]:
