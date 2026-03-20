@@ -69,15 +69,16 @@ class HuggingFaceModel(BaseModel):
         
         # Handle 4-bit quantization
         if self.kwargs.get("load_in_4bit", False):
-            try:
-                from transformers import BitsAndBytesConfig
-                model_kwargs["quantization_config"] = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_compute_dtype=self.torch_dtype,
-                )
-                model_kwargs["device_map"] = "auto"
-            except ImportError:
-                logger.warning("bitsandbytes not installed. Ignoring load_in_4bit.")
+            if "bnb-4bit" not in self.model_name.lower():
+                try:
+                    from transformers import BitsAndBytesConfig
+                    model_kwargs["quantization_config"] = BitsAndBytesConfig(
+                        load_in_4bit=True,
+                        bnb_4bit_compute_dtype=self.torch_dtype,
+                    )
+                    model_kwargs["device_map"] = "auto"
+                except ImportError:
+                    logger.warning("bitsandbytes not installed. Ignoring load_in_4bit.")
             self.kwargs.pop("load_in_4bit", None)
             
         # Extract peft_model
@@ -163,16 +164,23 @@ class HuggingFaceModel(BaseModel):
         inputs = self.prepare_inputs(prompts)
         
         # Set up generation config
-        generation_config = GenerationConfig(
-            max_new_tokens=max_new_tokens,
-            temperature=temperature,
-            top_p=top_p,
-            top_k=top_k,
-            num_return_sequences=num_return_sequences,
-            pad_token_id=self.tokenizer.pad_token_id,
-            eos_token_id=self.tokenizer.eos_token_id,
-            **kwargs
-        )
+        gen_kwargs = {
+            "max_new_tokens": max_new_tokens,
+            "num_return_sequences": num_return_sequences,
+            "pad_token_id": self.tokenizer.pad_token_id,
+            "eos_token_id": self.tokenizer.eos_token_id,
+        }
+        
+        if temperature > 0:
+            gen_kwargs["do_sample"] = True
+            gen_kwargs["temperature"] = temperature
+            gen_kwargs["top_p"] = top_p
+            gen_kwargs["top_k"] = top_k
+        else:
+            gen_kwargs["do_sample"] = False
+            
+        gen_kwargs.update(kwargs)
+        generation_config = GenerationConfig(**gen_kwargs)
         
         # Generate outputs
         try:
